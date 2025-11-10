@@ -41,11 +41,18 @@ public class SecurityConfig {
                 .httpBasic(basic -> basic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/blindboxes").permitAll()
-                        .requestMatchers("/api/categories/**").permitAll()
+                        // Allow GET requests without authentication
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/blindboxes",
+                                "/api/blindboxes/**")
+                        .permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/categories",
+                                "/api/categories/**")
+                        .permitAll()
+                        // Swagger/OpenAPI
                         .requestMatchers("/v3/api-docs", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
                                 "/swagger-resources/**", "/webjars/**")
                         .permitAll()
+                        // All other requests need authentication
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
